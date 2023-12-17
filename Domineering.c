@@ -4,7 +4,10 @@
 #define Bot '1'
 #define Player '0'
 #define SAVE '2'
-#define INFINITY 9999
+#define INFINITY 99999
+
+
+
 char mat[N][N]={{' ',' ',' ',' ',' ',' ',' ',' '},
                 {' ',' ',' ',' ',' ',' ',' ',' '},
                 {' ',' ',' ',' ',' ',' ',' ',' '},
@@ -14,8 +17,9 @@ char mat[N][N]={{' ',' ',' ',' ',' ',' ',' ',' '},
                 {' ',' ',' ',' ',' ',' ',' ',' '},
                 {' ',' ',' ',' ',' ',' ',' ',' '}};
 
-void print_mat()
+void print_mat()  // print the matrix
 {
+    system("cls");
     printf("    0   1   2   3   4   5   6   7 \n");
     printf("  ---------------------------------\n");
     for(int i=0;i<N;i++)
@@ -28,6 +32,7 @@ void print_mat()
     }
 }
 
+// check if the game is over
 int check_game()
 {
     for(int i=0;i<N;i++)
@@ -49,6 +54,7 @@ int check_game()
     return 1;
 }
 
+//  count the number of place save
 int number_place_save(char ply)
 {
     int number_place=0,bol=1;
@@ -100,7 +106,7 @@ int number_place_save(char ply)
     }
 }
 
-int test_place(char ply,int i,int j)
+int test_place(char ply,int i,int j)  // test if the place is stored
 {
     if(ply == Bot)
     {
@@ -120,7 +126,7 @@ int test_place(char ply,int i,int j)
     }
 }
 
-void stocker_place_save(char ply)
+void stock_place_save(char ply)  // store the place save 
 {
     if(ply == Bot)
     {
@@ -151,7 +157,7 @@ void stocker_place_save(char ply)
     }
 }
 
-void delete_place_save()
+void delete_place_save()  // delete the place save
 {
     for(int i=0;i<N;i++)
     {
@@ -163,12 +169,12 @@ void delete_place_save()
     }
 }
 
-int number_place_non_save(char ply)
+int number_place_non_save(char ply)   // count the number of place non save
 {
     int nb=0;
     if(ply == Bot)
     {
-        stocker_place_save(Bot);
+        stock_place_save(Bot);
         for(int i=0;i<N;i++)
         {
             for(int j=0;j<N-1;j++)
@@ -181,7 +187,7 @@ int number_place_non_save(char ply)
         return nb;
     }
     else{
-        stocker_place_save(Player);
+        stock_place_save(Player);
         for(int j=0;j<N;j++)
         {
             for(int i=0;i<N-1;i++)
@@ -195,7 +201,7 @@ int number_place_non_save(char ply)
     }
 }
 
-int number_play(char ply)
+int number_play(char ply)  // count the number of play or score of the player
 {
     int score=0;
     if(ply == Bot)
@@ -230,54 +236,59 @@ int number_play(char ply)
     }
 }
 
-int best_pos(char ply)
+int best_pos(char ply)   // find the best position to play
 {
-    int cij,nb,nb_save,nb_max;
+    int cij,number_place_stock,nb_save,nb_max;
+
     if(ply == Bot)
     {
-        nb = number_place_save(Bot);
-        nb_max = nb;
+        number_place_stock = number_place_save(Bot);
+        nb_max = number_place_stock;
+        print_mat( );
+        return 0;
         for(int i=0;i<N;i++)
         {
             for(int j=0;j<N-1;j++)
             {
-                stocker_place_save(Bot);
+                stock_place_save(Bot);
                 if(mat[i][j] == ' ' && mat[i][j+1] == ' ')
                 {
-                    mat[i][j] == Bot;
-                    mat[i][j+1] == Bot;
+                    mat[i][j] = Bot;
+                    mat[i][j+1] = Bot;
                     nb_save = number_place_save(Bot);
-                    mat[i][j] == ' ';
-                    mat[i][j+1] == ' ';
+                    mat[i][j] = ' ';
+                    mat[i][j+1] = ' ';
                     if(nb_save > nb_max)
                     {
                         nb_max = nb_save;
-                        cij=i*8+j;
+                        cij = i*8+j;
                     }
                 }
                 delete_place_save();
             }
         }
-        if(nb_max != nb)
+        if(nb_max != number_place_stock)
         return cij;
         else return -1;
 
     }
     else{
-        nb =number_place_save(Player);
-        nb_max =nb;
+        number_place_stock =number_place_save(Player);
+        nb_max = number_place_stock;
+        
         for(int j=0;j<N;j++)
         {
             for(int i=0;i<N-1;i++)
             {
-                stocker_place_save(Player);
+                stock_place_save(Player);
+                
                 if(mat[i][j] == ' ' && mat[i+1][j] == ' ')
                 {
-                    mat[i][j] == Player;
-                    mat[i+1][j] == Player;
+                    mat[i][j] = Player;
+                    mat[i+1][j] = Player;
                     nb_save = number_place_save(Player);
-                    mat[i][j] == ' ';
-                    mat[i][j+1] == ' ';
+                    mat[i][j] = ' ';
+                    mat[i+1][j] = ' ';
                     if(nb_save > nb_max)
                     {
                         nb_max = nb_save;
@@ -287,17 +298,22 @@ int best_pos(char ply)
                 delete_place_save();
             }
         }
-        if(nb_max != nb)
+        if(nb_max != number_place_stock)
         return cij;
         else return -1;
     }
 }
 
-int minimax(int min_max)
+int minimax(int min_max)  // min max algorithm
 {
-    int bestScore,score,pos;
-    int a,b,c,d;
+    int bestScore,score,pos,score_bot,score_player;
 
+    if(check_game())
+    {
+        score_bot = number_place_save(Bot) + number_play(Bot);
+        score_player = number_place_save(Player) + number_play(Player);
+        return score_bot - score_player;
+    }
     if(min_max)
     {
         bestScore = -INFINITY;
@@ -310,21 +326,20 @@ int minimax(int min_max)
             mat[pos/8][pos%8] = ' ';
             mat[pos/8][pos%8+1] = ' ';
             if(score > bestScore)
-            bestScore = score;
+            	bestScore = score;
             return bestScore;
         }
         else{
-            a= number_place_save(Bot);
-            b= number_play(Bot);
-            c=number_place_save(Player);
-            d= number_play(Player);
-            return (a+b)-(c+d);
+            score_bot = number_place_save(Bot) + number_play(Bot);
+            score_player = number_place_save(Player) + number_play(Player);
+            return score_bot - score_player;
         }
     }
     else
     {
         bestScore = INFINITY;
         pos = best_pos(Player);
+        
         if(pos != -1)
         {
             mat[pos/8][pos%8] = Player;
@@ -333,28 +348,27 @@ int minimax(int min_max)
             mat[pos/8][pos%8] = ' ';
             mat[pos/8+1][pos%8] = ' ';
             if(score < bestScore)
-            bestScore = score;
+            	bestScore = score;
             return bestScore;
         }
         else{
-            a= number_place_save(Bot);
-            b= number_play(Bot);
-            c=number_place_save(Player);
-            d= number_play(Player);
-            return (a+b)-(c+d);
+            score_bot = number_place_save(Bot) + number_play(Bot);
+            score_player = number_place_save(Player) + number_play(Player);
+            return score_bot - score_player;
         }
     }
 }
 
-int best_Move()
+int best_play()  // find the best play
 {
     int bestMove,bestScore = -INFINITY,score;
     int i,j,pos;
+    
     for(i=0;i<N;i++)
     {
         for(j=0;j<N-1;j++)
         {
-            stocker_place_save(Bot);
+            stock_place_save(Bot);
             if(mat[i][j] == ' ' && mat[i][j+1] ==' ')
             {
                 mat[i][j] = Bot;
@@ -374,17 +388,17 @@ int best_Move()
     return bestMove;
 }
 
-void play()
+void play() // the player play
 {
     int i,j;
     printf(" show i,j :");
     scanf("%d%d",&i,&j);
     mat[i][j] = Player;
     mat[i+1][j] = Player;
-    print_mat();
+    //print_mat();
 }
 
-int charge_BOT()
+int charge_BOT()  // find aij the position save
 {
     for(int i=0;i<N;i++)
     {
@@ -394,37 +408,42 @@ int charge_BOT()
             return i*8+j;
         }
     }
+    return -1;
 }
 
 int main()
 {
-    int i,j,c,b,aij;
-    //mat[1][0] = Bot;
-    //mat[1][1] = Bot;
+    int i,j,best_position,b=1,aij;
+    mat[1][0] = Bot;
+    mat[1][1] = Bot;
     print_mat();
     while(!check_game())
     {
         play();
-        b=1;
         if(number_place_non_save(Bot) != 0)
         {
-            c = best_Move();
-            mat[c/8][c%8] = Bot;
-            mat[c/8][c%8+1] = Bot;
-            b=1;
+            //find best position and play it 
+            best_position = best_play();
+            mat[best_position/8][best_position%8] = Bot;
+            mat[best_position/8][best_position%8+1] = Bot;
         }
         else{
+            //find aij and position save and play it
             aij = charge_BOT();
-            printf("\n %d \n",aij);
-            mat[aij/8][aij%8] = Bot;
-            mat[aij/8][aij%8+1] = Bot;
-            b=1;
+            if (aij != -1)
+            {
+                mat[aij/8][aij%8] = Bot;
+                mat[aij/8][aij%8+1] = Bot;
+            }else{      //the player win
+                b=0;
+                break;
+            }
         }
         print_mat();
     }
     if(b)
-    printf("\n The bot beat you");
+    printf("\n The Bot beat you");
     else 
-    printf("\n the Player beat");
+    printf("\n The Player beat");
     return 0;
 }
