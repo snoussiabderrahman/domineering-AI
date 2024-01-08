@@ -244,8 +244,7 @@ int best_pos(char ply)   // find the best position to play
     {
         number_place_stock = number_place_save(Bot);
         nb_max = number_place_stock;
-        print_mat( );
-        return 0;
+  
         for(int i=0;i<N;i++)
         {
             for(int j=0;j<N-1;j++)
