@@ -83,7 +83,7 @@ int get_possibilities(char ply) {
 }
 
 int alphabeta(int depth, char ply, int *ri, int *rj, int alpha, int beta) {
-    if (recursivity == 0 || get_possibilities(ply) == 0)
+    if (depth == 0 || get_possibilities(ply) == 0)
         return get_possibilities(ply) - ((ply == Bot) ? get_possibilities(Player) : get_possibilities(Bot));
 
     int fi = 0;
