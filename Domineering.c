@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define DEPTH 5
+#define DEPTH 6
 #define INFINITY __INT_MAX__
 #define Bot 'B'
 #define Player 'P'
@@ -82,8 +82,8 @@ int get_possibilities(char ply) {
     return sum;
 }
 
-int alphabeta(int recursivity, char ply, int *ri, int *rj, int alpha, int beta) {
-    if (recursivity == 0)
+int alphabeta(int depth, char ply, int *ri, int *rj, int alpha, int beta) {
+    if (recursivity == 0 || get_possibilities(ply) == 0)
         return get_possibilities(ply) - ((ply == Bot) ? get_possibilities(Player) : get_possibilities(Bot));
 
     int fi = 0;
@@ -91,7 +91,7 @@ int alphabeta(int recursivity, char ply, int *ri, int *rj, int alpha, int beta) 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (place_item(i, j, ply, true)) {
-                int e = -alphabeta(recursivity - 1, ((ply == Bot) ? Player : Bot), &fi, &fj, -beta, -alpha);
+                int e = -alphabeta(depth - 1, ((ply == Bot) ? Player : Bot), &fi, &fj, -beta, -alpha);
                 remove_item(i, j, ply);
                 if (e > alpha) {
                     alpha = e;
